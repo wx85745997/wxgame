@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>webgl 三角形矩阵 </title>
+</head>
+
+<body>
+    <canvas id='myCanvas'>
+    </canvas>
+
+    <script>
+        //获取canvas dom
+        var canvas = document.querySelector('canvas')
+        //获取webgl的上下文 类似于 canvas.getContext('2d')
+        var gl = canvas.getContext('webgl')
+        //创建着色器程序
+        var program = gl.createProgram()
+
+
+        //定点着色器和片元着色器的源代码
+        var VSHADER_SOURCE, FSHADER_SOURCE
+        //顶点着色器和片元着色器
+        var vertexShader, fragmentShader;
+
+
+        //顶点着色器源码
+        VSHADER_SOURCE = 'attribute vec4 a_Position;\n' +
+            'void main () {\n' +
+            'gl_Position = a_Position;\n' +
+            '}\n'
+
+        //片元着色器源码
+        FSHADER_SOURCE = 'void main () {\n' +
+            'gl_FragColor = vec4(1.0,0.0,0.0,1.0);\n' +
+            '}\n'
+
+
+
+
+        //define vertex shader
+        function createShader(gl, sourceCode, type) {
+            //createShader  
+            var shader = gl.createShader(type)
+            //按照视频写的有问题
+            //gl.sourceCode(shader, sourceCode)
+            gl.shaderSource(shader, sourceCode)
+            gl.compileShader(shader)
+            return shader
+        }
+
+        vertexShader = createShader(gl, VSHADER_SOURCE, gl.VERTEX_SHADER)
+
+
+
+        //define frament shader
+        fragmentShader = createShader(gl, FSHADER_SOURCE, gl.FRAGMENT_SHADER)
+
+
+        //附加着色器程序
+        gl.attachShader(program, vertexShader)
+        //附加着色器程序
+        gl.attachShader(program, fragmentShader)
+        //链接着色器程序
+        gl.linkProgram(program)
+        //使用程序
+        gl.useProgram(program)
+
+        gl.program = program;
+
+        //write the position of vertices to a vertex shader
+
+        function initVertexBuffers(gl) {
+            var vertices = new Float32Array([
+                0, 0.5, -0.5, -0.5, 0.5, -0.5
+            ])
+            var n = 3;
+            var vertexBuffer = gl.createBuffer()
+            gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer)
+            //write data into the buffer object
+            gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW)
+            //get attribute a_Position address in vertex shader
+            var a_Position = gl.getAttribLocation(gl.program, 'a_Position')
+            gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0)
+            //enable a_Position variable 
+            gl.enableVertexAttribArray(a_Position)
+            return n
+        }
+
+        var n = initVertexBuffers(gl)
+
+        //clear canvas and add background color
+
+
+        function draw() {
+            gl.clearColor(0, 0, 0, 1)
+            gl.drawArrays(gl.TRIANGLES, 0, n)
+        }
+
+        draw()
+    </script>
+</body>
+
+</html>
